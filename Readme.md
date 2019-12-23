@@ -7,4 +7,6 @@ baseurl: "/blog"
 url: "https://adityassrana.github.io"
 ````
 
-For this specific blog I also had to change  < base href="https://adityassrana.github.io/blog/" > in blog\_includes\head.html
+For this specific blog I also had to change  < base href="https://adityassrana.github.io/blog/" > in blog\\\_includes\head.html
+
+For more info, check out this [link](https://byparker.com/blog/2014/clearing-up-confusion-around-baseurl/)
