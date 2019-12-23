@@ -1,10 +1,10 @@
 # Site settings
 title: Aditya Rana blog
-email: 
+email: adityassrana2@gmail.com
 description: ""
-baseurl: "/beginagain"
-url: "https://adityassrana.github.io"
-twitter_username: lukeario
+baseurl: "/blog"
+url: "https://adityassrana.github.io/blog"
+twitter_username: adityassrana
 github_username:  adityassrana
 
 # Build settings
