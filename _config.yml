@@ -2,8 +2,8 @@
 title: Aditya Rana blog
 email: adityassrana2@gmail.com
 description: ""
-baseurl: ""
-url: "https://adityassrana.github.io/blog"
+baseurl: "blog"
+url: "https://adityassrana.github.io/blog/"
 twitter_username: adityassrana
 github_username:  adityassrana
 
