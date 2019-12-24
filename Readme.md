@@ -1,6 +1,6 @@
 # My blog
 
-## adityassrana.github.io\\blog
+## adityassrana.github.io\/blog
 This blog is made using Jekyll pages, and is being built from a separate github repository. Don't forget to change the \_config.yml file for ensuring that Jekyll builds properly, for ex.
 
 ````
