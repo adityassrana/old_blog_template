@@ -226,8 +226,8 @@ a:visited { color: #205caa; }
 .post pre,
 
 .post code {
-  border: 1px solid #d7d7d7;
-  background-color: #eee;
+  border: 1px solid #d5d5e9;
+  background-color: #eef;
   padding: 10px;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
