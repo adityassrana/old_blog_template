@@ -227,10 +227,17 @@ a:visited { color: #205caa; }
 .post code {
   border: 1px solid #d5d5e9;
   background-color: #eef;
+<<<<<<< HEAD
   padding: 8px 12px;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
+=======
+  padding: 10px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+>>>>>>> parent of 8ea4786... change code background to gray
   font-size: 15px;
   overflow:auto;
 }
