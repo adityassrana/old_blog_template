@@ -33,7 +33,7 @@ The model and the conv layer expect as input a tensor in the above format, so wh
 
 5. the transforms.ToTensor() or TF.to_tensor(functional version of the same command) separates the PIL Image into 3 channels (R,G,B), converts it to the range (0,1). You can multiply by 255 to get the range (0,255.
 
-6. Using transforms.Normalize(mean=[_ ,_ ,_ ],std = [_ ,_ ,_ ]) subtracts the mean and divides by the sandard deviation. It is **important** to apply the specified mean and std when using a **pre-trained model.** This will normalize the image in the range [-1,1]. To get the orinal image back just use 
+6. Using transforms.Normalize(mean=[_ ,_ ,_ ],std = [_ ,_ ,_ ]) subtracts the mean and divides by the sandard deviation. It is **important** to apply the specified mean and std when using a **pre-trained model.** This will normalize the image in the range [-1,1]. To get the orinal image back just use
     ````python
     image = ((image * std) + mean)
     ````
@@ -51,29 +51,30 @@ For image tensors with values in [0, 1] this transformation will standardize it,
     ````python
     for data in train_loader():
     ````
-__ getitem method__ is called and that is when the transformations are applied.
+    __ getitem method__ is called and that is when the transformations are applied.
 
 
 8. torchvision.transforms vs torchvision.transforms.functional
 
-The functional API is stateless, i.e. you can use the functions directly passing all necessary arguments.
-On the other side torchvision.transforms are mostly classes which have some default parameters or which store the parameters you’ve provided.
-For example using Normalize, you could define the class and use it with the passed parameters. Using the functional approach, you would have to pass the parameters every time:
+    The functional API is stateless, i.e. you can use the functions directly passing all necessary arguments.
+    On the other side torchvision.transforms are mostly classes which have some default parameters or which store the parameters you’ve provided.
+    For example using Normalize, you could define the class and use it with the passed parameters. Using the functional approach, you would have to pass the parameters every time:
 
-transform = transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
-data = transform(data)
+    transform = transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
+    data = transform(data)
+
     ````python
     # Functional
     data = TF.normalize(data, mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
     ````
 
-You can use the functional API to transform your data and target with the same random values, e.g. for random cropping:
+    You can use the functional API to transform your data and target with the same random values, e.g. for random cropping:
 
-````python
-i, j, h, w = transforms.RandomCrop.get_params(image, output_size=(512, 512))
-image = TF.crop(image, i, j, h, w)
-mask = TF.crop(mask, i, j, h, w)
-````
+    ````python
+    i, j, h, w = transforms.RandomCrop.get_params(image, output_size=(512, 512))
+    image = TF.crop(image, i, j, h, w)
+    mask = TF.crop(mask, i, j, h, w)
+    ````
 9. Functional API also allows us to perform identical transform on both image and target
     ````python
 
@@ -94,54 +95,55 @@ mask = TF.crop(mask, i, j, h, w)
         mask = TF.vflip(mask)
 
     ````
-Example Dataset Class:
+10. Example Dataset Class:
 
-````python
-import torch
-from torch.utils.data import Dataset
-from PIL import Image
-import torchvision
-import torchvision.transforms.functional as TF #it's not tensorflow
-from torchvision import transforms
+    ````python
+    import torch
+    from torch.utils.data import Dataset
+    from PIL import Image
+    import torchvision
+    import torchvision.transforms.functional as TF #it's not tensorflow
+    from torchvision import transforms
 
-class Image_Train_Dataset(Dataset): #inherit from Dataset class and overrride the methods __len__ and __getitem__
-    def __init__(self,image_paths):
-        self.list_id = open(image_paths_list,'r').read().splitlines()
-        
-    def __len__(self):
-        #return size of the Dataset
-        return len(self.list_id)
+    class Image_Train_Dataset(Dataset): #inherit from Dataset class and overrride the methods __len__ and __getitem__
+        def __init__(self,image_paths):
+            self.list_id = open(image_paths_list,'r').read().splitlines()
+            
+        def __len__(self):
+            #return size of the Dataset
+            return len(self.list_id)
 
-    def transform(self,image):
-        i, j, h, w = transforms.RandomCrop.get_params(image, output_size=(256,256))#allows us to apply the same crop on semantic segmentation if it's used
-        image = TF.crop(image, i, j, h, w)
-        image = TF.resize(image,size=(128,128))
-        image = TF.to_tensor(image)
-        return image
+        def transform(self,image):
+            i, j, h, w = transforms.RandomCrop.get_params(image, output_size=(256,256))#allows us to apply the same crop on semantic segmentation if it's used
+            image = TF.crop(image, i, j, h, w)
+            image = TF.resize(image,size=(128,128))
+            image = TF.to_tensor(image)
+            return image
 
-    def __getitem__(self, index):
-        #generates one sample of data
-        image = Image.open(self.list_id[index])
-        if image.mode == 'L':
-            image = image.convert('RGB')
-        image= self.transform(image)
-        return image
+        def __getitem__(self, index):
+            #generates one sample of data
+            image = Image.open(self.list_id[index])
+            if image.mode == 'L':
+                image = image.convert('RGB')
+            image= self.transform(image)
+            return image
 
-    def load_img_data(self,index):#for making inference easier
-        image = Image.open(self.list_id[index])
-        return image
+        def load_img_data(self,index):#for making inference easier
+            image = Image.open(self.list_id[index])
+            return image
 
-    def load_tensor_data(self,index):
-        image = Image.open(self.list_id[index])
-        image = self.transform(image)
-        return image
-````
+        def load_tensor_data(self,index):
+            image = Image.open(self.list_id[index])
+            image = self.transform(image)
+            return image
+    ````
 
 ### Writing your own custom Autograd Functions
 
-1. [PyTorch Examples for Reference Github](https://github.com/pytorch/pytorch/blob/53fe804322640653d2dddaed394838b868ce9a26/torch/autograd/_functions/pointwise.py
-)
+1. [PyTorch Examples for Reference Github](https://github.com/pytorch/pytorch/blob/53fe804322640653d2dddaed394838b868ce9a26/torch/autograd/_functions/pointwise.py)
+
 2. [PyTorch official docs](https://pytorch.org/tutorials/beginner/examples_autograd/two_layer_net_custom_function.html)
+
 3. Gradient returned by the class should have the same shape as the input to the class, to be able to update the input in the optimizer.step() function.
 
 4. Avoid using in-place operations as they cause problems while back-propagation becauese they modify the graph. As a precaution always clone the input in the forward pass, and clone 
@@ -158,32 +160,32 @@ return grad_input
 
 5. Example
 
-````python
-class MyReLU(torch.autograd.Function):
+    ````python
+    class MyReLU(torch.autograd.Function):
 
-    @staticmethod
-    def forward(ctx, i):
-        input = i.clone()
-        """ ctx is a context object that can be used
-        to stash information for backward computation. You can cache arbitrary
-        objects for use in the backward pass using the ctx.save_for_backward method.
-        """
-        ctx.save_for_backward(input)
-        return input.clamp(min=0)
+        @staticmethod
+        def forward(ctx, i):
+            input = i.clone()
+            """ ctx is a context object that can be used
+            to stash information for backward computation. You can cache arbitrary
+            objects for use in the backward pass using the ctx.save_for_backward method.
+            """
+            ctx.save_for_backward(input)
+            return input.clamp(min=0)
 
-    @staticmethod
-    def backward(ctx, grad_output):
-        """
-        In the backward pass we receive a Tensor containing the gradient of the loss
-        with respect to the output, and we need to compute the gradient of the loss
-        with respect to the input.
-        """
-        input, = ctx.saved_tensors
-        grad_input = grad_output.clone()
-        grad_input[input < 0] = 0
-        return grad_input
+        @staticmethod
+        def backward(ctx, grad_output):
+            """
+            In the backward pass we receive a Tensor containing the gradient of the loss
+            with respect to the output, and we need to compute the gradient of the loss
+            with respect to the input.
+            """
+            input, = ctx.saved_tensors
+            grad_input = grad_output.clone()
+            grad_input[input < 0] = 0
+            return grad_input
 
-````
+    ````
 
 
 6. Dealing with non-differentiable functions:
@@ -213,11 +215,10 @@ class MyReLU(torch.autograd.Function):
     ````
 
 2. Python saves models as a state_dict which can then be loaded to a model. On Loading a model it shows a message like
-
     ````
     IncompatibleKeys(missing_keys=[], unexpected_keys=[])
     ````
-This means there were no missing keys.
+    This means there were no missing keys.
 
 3. Use this when you have added new layers to the architecture which were not present in the model you saved as checkpoint
 
