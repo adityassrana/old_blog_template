@@ -2,7 +2,8 @@
 /* ----------------------------------------------------------*/
 * {
   margin: 0;
-  padding: 0;
+  padding: 0
+  margin-top:12px;
 }
 
 html, body { height: 100%; }
@@ -221,15 +222,6 @@ a:visited { color: #205caa; }
   margin: 30px 0;
 }
 
-
-li {
-    padding-bottom: 20px;
-}
-
-ul {
-    border: 1px solid #f00;
-}
-
 .post-content ul,
 
 .post-content ol { padding-left: 1em; 
@@ -251,10 +243,8 @@ ul {
   font-size: 16px;
   overflow:auto;
   font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
-  margin-top: 8px;
-  margin-bottom: 8px;
 }
-
+}
 
 .post code { padding: 1px 5px; }
 
