@@ -78,8 +78,8 @@ image = TF.crop(image, i, j, h, w)
 mask = TF.crop(mask, i, j, h, w)
 ````
 9. Functional API also allows us to perform identical transform on both image and target
-````python
 
+````python
 def transform(self, image, mask):
     # Resize
     resize = transforms.Resize(size=(520, 520))
@@ -95,7 +95,6 @@ if random.random() > 0.5:
 if random.random() > 0.5:
     image = TF.vflip(image)
     mask = TF.vflip(mask)
-
 ````
 Example Dataset Class:
 
