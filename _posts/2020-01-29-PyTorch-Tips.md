@@ -38,12 +38,12 @@ The model and the conv layer expect as input a tensor in the above format, so wh
     image = ((image * std) + mean)
     ````
 
-For example, when using a model trained on ImageNet it is common to apply the tranformation
+    For example, when using a model trained on ImageNet it is common to apply the tranformation
     ````python
     transforms.Normalize(mean=[0.485, 0.456, 0.406],
                          std=[0.229, 0.224, 0.225])
     ````
-For image tensors with values in [0, 1] this transformation will standardize it, so that the mean of the data should be ~0 and the std ~1. This is also known as standard score or z-score in the literature, and usually helps your training.
+    For image tensors with values in [0, 1] this transformation will standardize it, so that the mean of the data should be ~0 and the std ~1. This is also known as standard score or z-score in the literature, and usually helps your training.
 
 
 7. Data Augmentation happens when
