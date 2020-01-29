@@ -223,7 +223,12 @@ a:visited { color: #205caa; }
 
 .post-content ul,
 
-.post-content ol { padding-left: 2em; }
+.post-content ol { padding-left: 1em; 
+  line-height: 1.5em;
+  margin-bottom: 16px;
+  margin-top: 16px;
+  height: auto;
+}
 
 .post pre,
 
