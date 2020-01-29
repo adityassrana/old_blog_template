@@ -6,6 +6,7 @@ excerpt: an introductory guide to help people get comfortable with PyTorch funct
 date: 2020-01-29 16:41:00 +0000
 ---
 ### PyTorch and its Modules
+
 1. Variables are now deprectaed. Tensors can use Autograd directly.
 2. The forward function in the NN module defines how to get the output from the NN.
 the nn.module() has a __ call function 
@@ -26,8 +27,8 @@ The model and the conv layer expect as input a tensor in the above format, so wh
 ### Dataset and DataLoader Shenanigans
 
 1. Create a dictionary: partition['train'] and partition['validation'].
-2. Save and Read the paths from textfiles using ls /* /* .png > train_path.txt
-3. For getting the number of images use ls /* /* .png | wc -l
+2. Save and Read the paths from textfiles using ````ls /* /* .png > train_path.txt````
+3. For getting the number of images use ````ls /* /* .png | wc -l````
 4. Order of Transform, image processing like crops and resize should be done on the PIL Image and not the tensor
     - Crop/Resize-->toTensor-->Normalize
 
