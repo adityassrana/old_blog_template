@@ -221,11 +221,6 @@ a:visited { color: #205caa; }
   margin: 30px 0;
 }
 
-.post-content ul,
-
-.post-content ol { padding-left: 1em; 
-  line-height: 1.5em;
-}
 
 li {
     padding-bottom: 20px;
@@ -233,6 +228,15 @@ li {
 
 ul {
     border: 1px solid #f00;
+}
+
+.post-content ul,
+
+.post-content ol { padding-left: 1em; 
+  line-height: 1.5em;
+  margin-bottom: 16px;
+  margin-top: 16px;
+  height: auto;
 }
 
 .post pre,
@@ -247,8 +251,10 @@ ul {
   font-size: 16px;
   overflow:auto;
   font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
-}
+
 
 .post code { padding: 1px 5px; }
 
@@ -261,8 +267,6 @@ ul {
   padding-right: 0;
   padding-left: 0;
   font-size: 85%;
-  margin-top: 4px;
-  margin-bottom: 4px;
 }
 
 /* terminal */
