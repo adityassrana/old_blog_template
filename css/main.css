@@ -222,13 +222,11 @@ a:visited { color: #205caa; }
   margin: 30px 0;
 }
 
+
+
 .post-content ul,
 
-.post-content ol { padding-left: 1em; 
-  line-height: 1.5em;
-  margin-bottom: 16px;
-  margin-top: 16px;
-  height: auto;
+.post-content ol { padding-left: 1em;
 }
 
 .post pre,
