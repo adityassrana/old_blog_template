@@ -5,19 +5,16 @@ title: PyTorch Tips and Tricks
 excerpt: an introductory guide to help people get comfortable with PyTorch functionalities.
 date: 2020-01-29 16:41:00 +0000
 ---
-
-# PyTorch
-
 ### PyTorch and its Modules
 1. Variables are now deprectaed. Tensors can use Autograd directly.
 2. The forward function in the NN module defines how to get the output from the NN.
 the nn.module() has a __ call function 
-    
+
     ````python
     model = NN()
     model(local_batch)#which calls net.forward(local_batch)
     ````
-    
+
 3. Input: (N,C,H,W)
 The model and the conv layer expect as input a tensor in the above format, so when feeding an image directly to the model, add a dimension for batching.
 4. Converting from img-->numpy representation and feeding the model gives an error, because the input is in ByteTensor format. Only float operations are supported for conv-like operations.
@@ -32,7 +29,7 @@ The model and the conv layer expect as input a tensor in the above format, so wh
 2. Save and Read the paths from textfiles using ls /* /* .png > train_path.txt
 3. For getting the number of images use ls /* /* .png | wc -l
 4. Order of Transform, image processing like crops and resize should be done on the PIL Image and not the tensor
-	- Crop/Resize-->toTensor-->Normalize
+    - Crop/Resize-->toTensor-->Normalize
 
 5. the transforms.ToTensor() or TF.to_tensor(functional version of the same command) separates the PIL Image into 3 channels (R,G,B), converts it to the range (0,1). You can multiply by 255 to get the range (0,255.
 
@@ -71,14 +68,15 @@ data = transform(data)
     ````
 
 You can use the functional API to transform your data and target with the same random values, e.g. for random cropping:
-    
+
 ````python
-        i, j, h, w = transforms.RandomCrop.get_params(image, output_size=(512, 512))
-        image = TF.crop(image, i, j, h, w)
-        mask = TF.crop(mask, i, j, h, w)
-    ````
+i, j, h, w = transforms.RandomCrop.get_params(image, output_size=(512, 512))
+image = TF.crop(image, i, j, h, w)
+mask = TF.crop(mask, i, j, h, w)
+````
 9. Functional API also allows us to perform identical transform on both image and target
     ````python
+
     def transform(self, image, mask):
         # Resize
         resize = transforms.Resize(size=(520, 520))
@@ -94,48 +92,50 @@ You can use the functional API to transform your data and target with the same r
     if random.random() > 0.5:
         image = TF.vflip(image)
         mask = TF.vflip(mask)
+
     ````
 Example Dataset Class:
-    ````python
-    import torch
-    from torch.utils.data import Dataset
-    from PIL import Image
-    import torchvision
-    import torchvision.transforms.functional as TF #it's not tensorflow
-    from torchvision import transforms
 
-    class Image_Train_Dataset(Dataset): #inherit from Dataset class and overrride the methods __len__ and __getitem__
-        def __init__(self,image_paths):
-            self.list_id = open(image_paths_list,'r').read().splitlines()
-            
-        def __len__(self):
-            #return size of the Dataset
-            return len(self.list_id)
+````python
+import torch
+from torch.utils.data import Dataset
+from PIL import Image
+import torchvision
+import torchvision.transforms.functional as TF #it's not tensorflow
+from torchvision import transforms
 
-        def transform(self,image):
-            i, j, h, w = transforms.RandomCrop.get_params(image, output_size=(256,256))#allows us to apply the same crop on semantic segmentation if it's used
-            image = TF.crop(image, i, j, h, w)
-            image = TF.resize(image,size=(128,128))
-            image = TF.to_tensor(image)
-            return image
+class Image_Train_Dataset(Dataset): #inherit from Dataset class and overrride the methods __len__ and __getitem__
+    def __init__(self,image_paths):
+        self.list_id = open(image_paths_list,'r').read().splitlines()
+        
+    def __len__(self):
+        #return size of the Dataset
+        return len(self.list_id)
 
-        def __getitem__(self, index):
-            #generates one sample of data
-            image = Image.open(self.list_id[index])
-            if image.mode == 'L':
-                image = image.convert('RGB')
-            image= self.transform(image)
-            return image
+    def transform(self,image):
+        i, j, h, w = transforms.RandomCrop.get_params(image, output_size=(256,256))#allows us to apply the same crop on semantic segmentation if it's used
+        image = TF.crop(image, i, j, h, w)
+        image = TF.resize(image,size=(128,128))
+        image = TF.to_tensor(image)
+        return image
 
-        def load_img_data(self,index):#for making inference easier
-            image = Image.open(self.list_id[index])
-            return image
+    def __getitem__(self, index):
+        #generates one sample of data
+        image = Image.open(self.list_id[index])
+        if image.mode == 'L':
+            image = image.convert('RGB')
+        image= self.transform(image)
+        return image
 
-        def load_tensor_data(self,index):
-            image = Image.open(self.list_id[index])
-            image = self.transform(image)
-            return image
-    ````
+    def load_img_data(self,index):#for making inference easier
+        image = Image.open(self.list_id[index])
+        return image
+
+    def load_tensor_data(self,index):
+        image = Image.open(self.list_id[index])
+        image = self.transform(image)
+        return image
+````
 
 ### Writing your own custom Autograd Functions
 
@@ -148,57 +148,60 @@ Example Dataset Class:
 the incoming gradients before modifying them.
 
 An in-place operation is an operation that changes directly the content of a given Tensor without making a copy. Inplace operations in pytorch are always postfixed with a _, like .add_() or .scatter_(). Python operations like \+ = or \*= are also inplace operations.
-    ````python
-    grad_input = grad_output.clone()
-    return grad_input
-    ````
+
+
+
+````python
+grad_input = grad_output.clone()
+return grad_input
+````
 
 5. Example
-    ````python
-    class MyReLU(torch.autograd.Function):
 
-        @staticmethod
-        def forward(ctx, i):
-        	input = i.clone()
-            """ ctx is a context object that can be used
-            to stash information for backward computation. You can cache arbitrary
-            objects for use in the backward pass using the ctx.save_for_backward method.
-            """
-            ctx.save_for_backward(input)
-            return input.clamp(min=0)
+````python
+class MyReLU(torch.autograd.Function):
 
-        @staticmethod
-        def backward(ctx, grad_output):
-            """
-            In the backward pass we receive a Tensor containing the gradient of the loss
-            with respect to the output, and we need to compute the gradient of the loss
-            with respect to the input.
-            """
-            input, = ctx.saved_tensors
-            grad_input = grad_output.clone()
-            grad_input[input < 0] = 0
-            return grad_input
+    @staticmethod
+    def forward(ctx, i):
+        input = i.clone()
+        """ ctx is a context object that can be used
+        to stash information for backward computation. You can cache arbitrary
+        objects for use in the backward pass using the ctx.save_for_backward method.
+        """
+        ctx.save_for_backward(input)
+        return input.clamp(min=0)
 
-    ````
+    @staticmethod
+    def backward(ctx, grad_output):
+        """
+        In the backward pass we receive a Tensor containing the gradient of the loss
+        with respect to the output, and we need to compute the gradient of the loss
+        with respect to the input.
+        """
+        input, = ctx.saved_tensors
+        grad_input = grad_output.clone()
+        grad_input[input < 0] = 0
+        return grad_input
+
+````
 
 
 6. Dealing with non-differentiable functions:
 
-w_hard : non-differentiable
-w_soft : differentiable proxy for w_hard
+    w_hard : non-differentiable
+    w_soft : differentiable proxy for w_hard
+
     ````python
     w_bar = w_soft + tf.stop_grad(w_hard - w_soft) #in tensorflow
     w_bar = w_soft + (w_hard - w_soft).detach()  #in PyTorch
     ````
-It gets you x_forward in the forward pass, but derivative acts as if you had x_backward
 
+    It gets you x_forward in the forward pass, but derivative acts as if you had x_backward
     ````
     y = x_backward + (x_forward - x_backward).detach()
     ````
 
-7. loss.backward() computes d(loss)/d(w) for every parameter which has requires_grad=True. They are accumulated in w.grad
-
-optimizer.step() updates w using w.grad, w += -lr* x.grad
+7. loss.backward() computes d(loss)/d(w) for every parameter which has requires_grad=True. They are accumulated in w.grad. And the optimizer.step() updates w using w.grad, w += -lr* x.grad
 
 ### Saving and Loading Models
 
