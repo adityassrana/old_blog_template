@@ -5,6 +5,8 @@ If you are new to Github pages, check out this link [Using Github Pages](https:/
 This blog is made using Jekyll and is being hosted on Github pages. You need to create a branch called gh-pages for that repository.
 Don't forget to change the \_config.yml file for ensuring that Jekyll builds properly, for ex.
 
+I have also changed the syntax highlighting used as the original was one was a pain in the eyes (pun intended).
+
 ````
 baseurl: "/blog"
 url: "https://adityassrana.github.io"
