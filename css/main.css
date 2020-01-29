@@ -2,8 +2,7 @@
 /* ----------------------------------------------------------*/
 * {
   margin: 0;
-  padding: 0
-  margin-top:12px;
+  padding: 0;
 }
 
 html, body { height: 100%; }
@@ -14,6 +13,10 @@ body {
   line-height: 1.5;
   font-weight: 300;
   background-color: #fdfdfd;
+}
+
+li:not(:last-child) {
+    padding-bottom: 20px;
 }
 
 h1, h2, h3, h4, h5, h6 { font-size: 100%; font-weight: 400; }
@@ -241,6 +244,8 @@ a:visited { color: #205caa; }
   font-size: 16px;
   overflow:auto;
   font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+  margin-top: 12px;
+  margin-bottom: 12px;
 }
 }
 
