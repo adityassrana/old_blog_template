@@ -3,7 +3,6 @@
 * {
   margin: 0;
   padding: 0;
-  margin-top:12px;
 }
 
 html, body { height: 100%; }
@@ -226,9 +225,14 @@ a:visited { color: #205caa; }
 
 .post-content ol { padding-left: 1em; 
   line-height: 1.5em;
-  margin-bottom: 16px;
-  margin-top: 16px;
-  height: auto;
+}
+
+li {
+    padding-bottom: 20px;
+}
+
+ul {
+    border: 1px solid #f00;
 }
 
 .post pre,
@@ -257,6 +261,8 @@ a:visited { color: #205caa; }
   padding-right: 0;
   padding-left: 0;
   font-size: 85%;
+  margin-top: 4px;
+  margin-bottom: 4px;
 }
 
 /* terminal */
