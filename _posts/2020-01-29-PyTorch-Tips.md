@@ -12,19 +12,19 @@ date: 2020-01-29 16:41:00 +0000
 1. Variables are now deprectaed. Tensors can use Autograd directly.
 2. The forward function in the NN module defines how to get the output from the NN.
 the nn.module() has a __ call function 
-
-````python
-model = NN()
-model(local_batch)#which calls net.forward(local_batch)
-````
-
+    
+    ````python
+    model = NN()
+    model(local_batch)#which calls net.forward(local_batch)
+    ````
+    
 3. Input: (N,C,H,W)
 The model and the conv layer expect as input a tensor in the above format, so when feeding an image directly to the model, add a dimension for batching.
 4. Converting from img-->numpy representation and feeding the model gives an error, because the input is in ByteTensor format. Only float operations are supported for conv-like operations.
 
-````python
-img = img.type('torch.DoubleTensor')
-````
+    ````python
+    img = img.type('torch.DoubleTensor')
+    ````
 
 ### Dataset and DataLoader Shenanigans
 
@@ -37,23 +37,23 @@ img = img.type('torch.DoubleTensor')
 5. the transforms.ToTensor() or TF.to_tensor(functional version of the same command) separates the PIL Image into 3 channels (R,G,B), converts it to the range (0,1). You can multiply by 255 to get the range (0,255.
 
 6. Using transforms.Normalize(mean=[_ ,_ ,_ ],std = [_ ,_ ,_ ]) subtracts the mean and divides by the sandard deviation. It is **important** to apply the specified mean and std when using a **pre-trained model.** This will normalize the image in the range [-1,1]. To get the orinal image back just use 
-````python
-image = ((image * std) + mean)
-````
+    ````python
+    image = ((image * std) + mean)
+    ````
 
 For example, when using a model trained on ImageNet it is common to apply the tranformation
-````python
-transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                     std=[0.229, 0.224, 0.225])
-````
+    ````python
+    transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                         std=[0.229, 0.224, 0.225])
+    ````
 For image tensors with values in [0, 1] this transformation will standardize it, so that the mean of the data should be ~0 and the std ~1. This is also known as standard score or z-score in the literature, and usually helps your training.
 
 
 7. Data Augmentation happens when
 
-````python
-for data in train_loader():
-````
+    ````python
+    for data in train_loader():
+    ````
 __ getitem method__ is called and that is when the transformations are applied.
 
 
@@ -65,37 +65,37 @@ For example using Normalize, you could define the class and use it with the pass
 
 transform = transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
 data = transform(data)
-````python
-# Functional
-data = TF.normalize(data, mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
-````
+    ````python
+    # Functional
+    data = TF.normalize(data, mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
+    ````
 
 You can use the functional API to transform your data and target with the same random values, e.g. for random cropping:
 
-````python
-i, j, h, w = transforms.RandomCrop.get_params(image, output_size=(512, 512))
-image = TF.crop(image, i, j, h, w)
-mask = TF.crop(mask, i, j, h, w)
-````
+    ````python
+    i, j, h, w = transforms.RandomCrop.get_params(image, output_size=(512, 512))
+    image = TF.crop(image, i, j, h, w)
+    mask = TF.crop(mask, i, j, h, w)
+    ````
 9. Functional API also allows us to perform identical transform on both image and target
 
-````python
-def transform(self, image, mask):
-    # Resize
-    resize = transforms.Resize(size=(520, 520))
-    image = resize(image)
-    mask = resize(mask
+    ````python
+    def transform(self, image, mask):
+        # Resize
+        resize = transforms.Resize(size=(520, 520))
+        image = resize(image)
+        mask = resize(mask
 
-# Random horizontal flipping
-if random.random() > 0.5:
-    image = TF.hflip(image)
-    mask = TF.hflip(mask)
+    # Random horizontal flipping
+    if random.random() > 0.5:
+        image = TF.hflip(image)
+        mask = TF.hflip(mask)
 
-# Random vertical flipping
-if random.random() > 0.5:
-    image = TF.vflip(image)
-    mask = TF.vflip(mask)
-````
+    # Random vertical flipping
+    if random.random() > 0.5:
+        image = TF.vflip(image)
+        mask = TF.vflip(mask)
+    ````
 Example Dataset Class:
 
 ````python
@@ -198,9 +198,10 @@ w_bar = w_soft + tf.stop_grad(w_hard - w_soft) #in tensorflow
 w_bar = w_soft + (w_hard - w_soft).detach()  #in PyTorch
 ````
 It gets you x_forward in the forward pass, but derivative acts as if you had x_backward
-````
-y = x_backward + (x_forward - x_backward).detach()
-````
+
+    ````
+    y = x_backward + (x_forward - x_backward).detach()
+    ````
 
 7. loss.backward() computes d(loss)/d(w) for every parameter which has requires_grad=True. They are accumulated in w.grad
 
@@ -209,36 +210,37 @@ optimizer.step() updates w using w.grad, w += -lr* x.grad
 ### Saving and Loading Models
 
 1. Saving a model, use either of the 2 ways depending on usage
-````python
-torch.save(model.state_dict(),'final-contours-branch{}.pt'.format(args.expname))
-torch.save({'epoch':epoch,'model_state_dict':model.state_dict(),'optimizer_state_dict':optimizer.state_dict(),'loss':train_loss},'resume_training.tar')
-````
+
+    ````python
+    torch.save(model.state_dict(),'final-contours-branch{}.pt'.format(args.expname))
+    torch.save({'epoch':epoch,'model_state_dict':model.state_dict(),'optimizer_state_dict':optimizer.state_dict(),'loss':train_loss},'resume_training.tar')
+    ````
 
 2. Python saves models as a state_dict which can then be loaded to a model. On Loading a model it shows a message like
 
-````
-IncompatibleKeys(missing_keys=[], unexpected_keys=[])
-````
+    ````
+    IncompatibleKeys(missing_keys=[], unexpected_keys=[])
+    ````
 This means there were no missing keys.
 
 3. Use this when you have added new layers to the architecture which were not present in the model you saved as checkpoint
 
-````python
-trained_dict = torch.load('checkpoint.pt')
-model = reducio_binarizer.Reducio()
-model.load_state_dict(trained_dict, strict=False)
-model.to(device)
+    ````python
+    trained_dict = torch.load('checkpoint.pt')
+    model = reducio_binarizer.Reducio()
+    model.load_state_dict(trained_dict, strict=False)
+    model.to(device)
 
-````
+    ````
 
 4.  Keyboard interrupt and saving the last state of a model:
 
-````python
-try:
-    # training code here
-except KeyboardInterrupt:
-    # save model here
-````
+    ````python
+    try:
+        # training code here
+    except KeyboardInterrupt:
+        # save model here
+    ````
 
 ### Learning Rate Schedulers
 
