@@ -7,7 +7,8 @@ date: 2020-01-29 16:41:00 +0000
 ---
 ### PyTorch and its Modules
 
-1. Variables are now deprectaed. Tensors can use Autograd directly.
+1. Variables are now deprecated. Tensors can use Autograd directly.
+
 2. The forward function in the NN module defines how to get the output from the NN.
 the nn.module() has a __ call function 
 
@@ -16,9 +17,9 @@ the nn.module() has a __ call function
     model(local_batch)#which calls net.forward(local_batch)
     ````
 
-3. Input: (N,C,H,W)
-The model and the conv layer expect as input a tensor in the above format, so when feeding an image directly to the model, add a dimension for batching.
-4. Converting from img-->numpy representation and feeding the model gives an error, because the input is in ByteTensor format. Only float operations are supported for conv-like operations.
+3. Input: (N,C,H,W). The model and the convolutional layers expect the input tensor to be in this format, so when feeding an image/images to the model, add a dimension for batching.
+
+4. Converting from img-->numpy representation and feeding  the model gives an error because the input is in ByteTensor format. Only float operations are supported for conv-like operations.
 
     ````python
     img = img.type('torch.DoubleTensor')
@@ -34,51 +35,50 @@ The model and the conv layer expect as input a tensor in the above format, so wh
 
 5. the transforms.ToTensor() or TF.to_tensor(functional version of the same command) separates the PIL Image into 3 channels (R,G,B), converts it to the range (0,1). You can multiply by 255 to get the range (0,255.
 
-6. Using transforms.Normalize(mean=[_ ,_ ,_ ],std = [_ ,_ ,_ ]) subtracts the mean and divides by the sandard deviation. It is **important** to apply the specified mean and std when using a **pre-trained model.** This will normalize the image in the range [-1,1]. To get the orinal image back just use
+6. Using transforms.Normalize(mean=[_ ,_ ,_ ],std = [_ ,_ ,_ ]) subtracts the mean and divides by the standard deviation. It is **important** to apply the specified mean and std when using a **pre-trained model**. This will normalize the image in the range [-1,1]. To get the original image back use
+
     ````python
     image = ((image * std) + mean)
     ````
 
-    For example, when using a model trained on ImageNet it is common to apply the tranformation
+    For example, when using a model trained on ImageNet it is common to apply the transformation
+
     ````python
     transforms.Normalize(mean=[0.485, 0.456, 0.406],
                          std=[0.229, 0.224, 0.225])
     ````
-    For image tensors with values in [0, 1] this transformation will standardize it, so that the mean of the data should be ~0 and the std ~1. This is also known as standard score or z-score in the literature, and usually helps your training.
+    For image tensors with values in [0, 1] this transformation will standardize it so that the mean of the data should be ~0 and the std ~1. This is also known as a standard score or z-score in the literature and usually helps in training.
 
-
-7. Data Augmentation happens when
+7. Data Augmentation happens at the step below. At this point __getitem__ method in the Dataset Class is called, and the transformations are applied.
 
     ````python
     for data in train_loader():
     ````
-    __ getitem method__ is called and that is when the transformations are applied.
+8. torchvision.transforms vs torchvision.transforms.functional.
 
+    The functional API is statelessand you can directly pass all the necessary arguments.
 
-8. torchvision.transforms vs torchvision.transforms.functional
+    Whereas torchvision.transforms are classes, initialized with some default parameters unless specified. 
 
-    The functional API is stateless, i.e. you can use the functions directly passing all necessary arguments.
-    On the other side torchvision.transforms are mostly classes which have some default parameters or which store the parameters you’ve provided.
-    For example using Normalize, you could define the class and use it with the passed parameters. Using the functional approach, you would have to pass the parameters every time:
-
+    ````python
+    # Class-based. Define once and use multiple times
     transform = transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
     data = transform(data)
 
-    ````python
-    # Functional
+    # Functional. Pass parameters each time
     data = TF.normalize(data, mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
     ````
 
-    You can use the functional API to transform your data and target with the same random values, e.g. for random cropping:
+9. The functional API is very useful when transforming your data and target with the same random values, e.g. random cropping:
 
     ````python
     i, j, h, w = transforms.RandomCrop.get_params(image, output_size=(512, 512))
     image = TF.crop(image, i, j, h, w)
     mask = TF.crop(mask, i, j, h, w)
+  
     ````
-9. Functional API also allows us to perform identical transform on both image and target
+    Functional API also allows us to perform identical transform on both image and target
     ````python
-
     def transform(self, image, mask):
         # Resize
         resize = transforms.Resize(size=(520, 520))
@@ -147,11 +147,9 @@ The model and the conv layer expect as input a tensor in the above format, so wh
 
 3. Gradient returned by the class should have the same shape as the input to the class, to be able to update the input in the optimizer.step() function.
 
-4. Avoid using in-place operations as they cause problems while back-propagation becauese they modify the graph. As a precaution always clone the input in the forward pass, and clone 
-the incoming gradients before modifying them.
+4. Avoid using in-place operations as they cause problems while back-propagation because the way they modify the graph. As a precaution, always clone the input in the forward pass, and clone the incoming gradients before modifying them.
 
-An in-place operation is an operation that changes directly the content of a given Tensor without making a copy. Inplace operations in pytorch are always postfixed with a _, like .add_() or .scatter_(). Python operations like \+ = or \*= are also inplace operations.
-
+An in-place operation directly modifies the content of a given Tensor without making a copy. Inplace operations in PyTorch are always postfixed with a _, like .add_() or .scatter_(). Python operations like \+ = or \*= are also inplace operations.
 
 
 ````python
@@ -208,19 +206,18 @@ return grad_input
 
 ### Saving and Loading Models
 
-1. Saving a model, use either of the 2 ways depending on usage
+1. Python saves models as a state_dict. You may use either of the two ways
 
     ````python
     torch.save(model.state_dict(),'final-contours-branch{}.pt'.format(args.expname))
     torch.save({'epoch':epoch,'model_state_dict':model.state_dict(),'optimizer_state_dict':optimizer.state_dict(),'loss':train_loss},'resume_training.tar')
     ````
 
-2. Python saves models as a state_dict which can then be loaded to a model. On Loading a model it shows a message like
+2. On Loading a model, if it shows a message like this, it means there were no missing keys.
+
     ````
     IncompatibleKeys(missing_keys=[], unexpected_keys=[])
     ````
-    This means there were no missing keys.
-
 3. Use this when you have added new layers to the architecture which were not present in the model you saved as checkpoint
 
     ````python
@@ -242,7 +239,7 @@ return grad_input
 
 ### Learning Rate Schedulers
 
-1. Change LR with increasing epochs. Also check [Reduce LR on Plateau](https://pytorch.org/docs/stable/_modules/torch/optim/lr_scheduler.html)
+1. Change LR with increasing epochs. Read [Reduce LR on Plateau](https://pytorch.org/docs/stable/_modules/torch/optim/lr_scheduler.html)
 
 ### Useful Links
 1. [Using _ in Variable Naming](https://dbader.org/blog/meaning-of-underscores-in-python)
