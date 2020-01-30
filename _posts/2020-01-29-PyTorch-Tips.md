@@ -2,7 +2,7 @@
 layout: post
 comments: true
 title: PyTorch Tips and Tricks
-excerpt: an introductory guide to help people get comfortable with PyTorch functionalities.
+excerpt: an little-more-than-introductory guide to help people get comfortable with PyTorch functionalities.
 date: 2020-01-29 16:41:00 +0000
 ---
 ### PyTorch and its Modules
