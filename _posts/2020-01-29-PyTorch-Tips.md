@@ -49,7 +49,7 @@ the nn.module() has a __ call function
     ````
     For image tensors with values in [0, 1] this transformation will standardize it so that the mean of the data should be ~0 and the std ~1. This is also known as a standard score or z-score in the literature and usually helps in training.
 
-7. Data Augmentation happens at the step below. At this point __getitem__ method in the Dataset Class is called, and the transformations are applied.
+7. Data Augmentation happens at the step below. At this point \_\_getitem\_\_ method in the Dataset Class is called, and the transformations are applied.
 
     ````python
     for data in train_loader():
